@@ -9,24 +9,25 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 let db = require('./models');
 
-let Users = db.Users;
+let users = db.Users;
 
-app.post('/users', function (req, res) {
-  Users.create({ username: req.body.username })
-  .then(function (user) {
-    res.json(user);
-  });
-});
-
-app.get('/users', function(req, res) {
-  Users.findAll()
+app.get('/', function(req, res) {
+  users.findAll()
   .then(function (users) {
     res.json(users);
   });
 });
 
-app.get('/', (req, res) => {
-  res.send('hello, is it me you\'re looking for?');
+app.post('/', function (req, res) {
+  users.create({ username: req.body.username, unique: true })
+  .then(function (user) {
+    res.json(user);
+  });
+});
+
+
+app.get('/gallery/:id', (req, res) => {
+  res.render('views/gallery');
 });
 
 app.listen(PORT, () => {
