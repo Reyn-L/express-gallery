@@ -9,21 +9,21 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 let db = require('./models');
 
-let users = db.Users;
+let photos = db.Photos;
 
 app.get('/', function(req, res) {
-  users.findAll()
-  .then(function (users) {
-    res.json(users);
+  photos.findAll()
+  .then(function (photos) {
+    res.json(photos);
   });
 });
 
-app.post('/', function (req, res) {
-  users.create({ username: req.body.username, unique: true })
-  .then(function (user) {
-    res.json(user);
-  });
-});
+// app.post('/', function (req, res) {
+//   Photo.create({ name: req.body.name, unique: true })
+//   .then(function (user) {
+//     res.json(user);
+//   });
+// });
 
 
 app.get('/gallery/:id', (req, res) => {
@@ -31,6 +31,7 @@ app.get('/gallery/:id', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  db.sequelize.sync();
+  db.sequelize.drop();
+  db.sequelize.sync({force: true});
   console.log(`server running on ${PORT}`);
 });
