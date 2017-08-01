@@ -7,7 +7,7 @@ let Authors = db.authors;
 let photos = db.photos;
 
 router.get('/', getAllGalleries);
-router.get('new', newGalleryForm);
+router.get('/new', newGalleryForm);
 router.get('/:id', displayGalleryPhoto);
 router.get('/:id/edit', editPhoto);
 
@@ -27,7 +27,7 @@ function getAllGalleries(req, res) {
 
 //Display Gallery Form
 function newGalleryForm(req, res) {
-  res.render('/views/gallery');
+  res.render('gallery/new');
 }
 
 //Displays a gallery photo based on request ID
@@ -43,8 +43,33 @@ function editPhoto(req, res){
   res.render('/views/gallery');
 }
 
-function loadNewPhoto(req, res){
-  res.render('views/gallery.new');
+function loadNewPhoto(req, res) {
+  //create link, uploader, descriptio
+  let name = req.body.author;
+  console.log(name);
+  let url = req.body.link;
+  let description = req.body.description;
+
+  let auId;
+
+  Authors.findAll( { where: {name: name} } )
+  .then( result => {
+    if (result[0] === undefined) {
+      Authors.create( {name: name} )
+      .then( ret => {
+        auId = ret.dataValues.id;
+        photos.create( {link: url, description: description, authorId: auId} );
+        let locals = { databaseEntry : [{ url, description, name } ] } ;
+        console.log(locals);
+        res.render('gallery/index', locals);
+      });
+    } else {
+      auId = result[0].dataValues.id;
+      photos.create({link: url, description: description, authorId: auId});
+      let locals = { databaseEntry : { url, description, name } };
+      res.render('gallery/index', locals);
+    }
+  });
 }
 
 function updatePhoto(req, res){

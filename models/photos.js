@@ -2,8 +2,7 @@ module.exports = function(sequelize, DataTypes) {
   var Photo = sequelize.define("photos", {
     link: {type: DataTypes.STRING,
       validate: {
-        isUrl: true,
-        allowNull: false,
+        isUrl: true
       }
     },
     description: DataTypes.TEXT
