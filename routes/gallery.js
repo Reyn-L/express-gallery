@@ -27,7 +27,7 @@ function getAllGalleries(req, res) {
   })
   .then( function (fotos) {
     let locals = { databaseEntries: fotos };
-    res.render('gallery/gallery', locals);
+    res.render('gallery/index', locals);
   })
   .catch((err) => {
     console.log(err);
@@ -72,14 +72,14 @@ function loadNewPhoto(req, res) {
       .then( ret => {
         auId = ret.dataValues.id;
         Photos.create( {link: url, description: description, authorId: auId} );
-        let locals = { databaseEntry : [{ url, description, name } ] } ;
-        res.render('gallery/index', locals);
+        let locals = {link: url, description: description, name: name };
+        res.render('gallery/photo', locals);
       });
     } else {
       auId = result[0].dataValues.id;
       Photos.create({link: url, description: description, authorId: auId});
-      let locals = { databaseEntry : { url, description, name } };
-      res.render('gallery/index', locals);
+      let locals = {link: url, description: description, name: name };
+      res.render('gallery/photo', locals);
     }
   });
 }
@@ -89,7 +89,7 @@ function updatePhoto(req, res){
 }
 
 function deletePhoto(req, res){
-  res.render('views/gallery');
+  res.render('gallery/:id/edit');
 }
 
 function updatePhoto(req, res){
