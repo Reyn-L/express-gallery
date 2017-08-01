@@ -7,7 +7,10 @@ const app = express();
 const expHbs = require('express-handlebars');
 
 let PORT = process.env.PORT || 3000;
+<<<<<<< HEAD
+=======
 
+>>>>>>> 7219cb0c465028f713ed9786c3dadb94ec93a51f
 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
