@@ -53,7 +53,12 @@ function displayGalleryPhoto(req, res) {
 }
 
 function editPhoto(req, res){
-  res.render('/views/gallery');
+ Photos.findById(req.params.id,
+  {include: [{model: Authors}]})
+ .then((photoById) => {
+  let locals = {id : photoById.id, link: photoById.link, description: photoById.description, name: photoById.author.name };
+  res.render('gallery/edit', locals);
+});
 }
 
 function loadNewPhoto(req, res) {
@@ -85,15 +90,27 @@ function loadNewPhoto(req, res) {
 }
 
 function updatePhoto(req, res){
-  res.render('views/gallery');
+  Photos.update({
+    description : req.params.description
+  },
+  {
+    where: {
+      id:req.params.id
+    }
+  })
+  .then((photoById) => {
+
+    res.redirect('/gallery/');
+  });
 }
 
 function deletePhoto(req, res){
-  res.render('gallery/:id/edit');
-}
-
-function updatePhoto(req, res){
-  res.render('views/gallery');
+  Photos.destroy({
+    where: {
+      id:req.params.id
+    }
+  });
+  res.redirect('/gallery/');
 }
 
 module.exports = router;
