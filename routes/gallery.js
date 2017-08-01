@@ -6,23 +6,16 @@ let db = require('../models');
 let Authors = db.authors;
 let photos = db.photos;
 
-// const cn = {
-//     host: 'localhost',
-//     port: 5432,
-//     database: 'products_articles'
-// };
-
-
 router.get('/', getAllGalleries);
-router.get('/gallery/new', newGalleryForm);
-router.get('/gallery/:id', displayGalleryPhoto);
-router.get('/gallery/:id/edit', editPhoto);
+router.get('/new', newGalleryForm);
+router.get('/:id', displayGalleryPhoto);
+router.get('/:id/edit', editPhoto);
 
-router.post('/gallery', loadNewPhoto);
+router.post('/', loadNewPhoto);
 
-router.put('/gallery/:id', updatePhoto);
+router.put('/:id', updatePhoto);
 
-router.delete('/gallery/:id', deletePhoto);
+router.delete('/:id', deletePhoto);
 
 function getAllGalleries(req, res) {
   photos.findAll()
@@ -34,7 +27,7 @@ function getAllGalleries(req, res) {
 
 //Display Gallery Form
 function newGalleryForm(req, res) {
-  res.render('views/gallery');
+  res.render('gallery/new');
 }
 
 //Displays a gallery photo based on request ID
@@ -47,12 +40,40 @@ function displayGalleryPhoto(req, res) {
 }
 
 function editPhoto(req, res){
-  res.render('views/gallery');
+  res.render('/views/gallery');
 }
 
-function loadNewPhoto(req, res){
+function loadNewPhoto(req, res) {
+  //create link, uploader, descriptio
+  let name = req.body.author;
+  console.log(name);
+  let url = req.body.link;
+  let description = req.body.description;
 
-  res.render('gallery/new');
+  let auId;
+
+  Authors.findAll( { where: {name: name} } )
+  .then( result => {
+    if (result[0] === undefined) {
+      Authors.create( {name: name} )
+      .then( ret => {
+        auId = ret.dataValues.id;
+        photos.create( {link: url, description: description, authorId: auId} );
+        let locals = { databaseEntry : [{ url, description, name } ] } ;
+        console.log(locals);
+        res.render('gallery/index', locals);
+      });
+    } else {
+      auId = result[0].dataValues.id;
+      photos.create({link: url, description: description, authorId: auId});
+      let locals = { databaseEntry : { url, description, name } };
+      res.render('gallery/index', locals);
+    }
+  });
+}
+
+function updatePhoto(req, res){
+  res.render('views/gallery');
 }
 
 function deletePhoto(req, res){
