@@ -1,0 +1,11 @@
+<h1>Edit</h1>
+<form stlye = 'display:inline' action='/gallery/{{id}}?_method=PUT' method='POST'>
+  <input type="text" name="Author name" placeholder="Author name" value="{{name}}">
+  <input type="text" name="Link" placeholder="Link" value="{{link}}">
+  <input type="text" name="Description" placeholder="Description" value="{{description}}">
+  <div></div>
+  <button type='submit'>submit</button>
+</form>
+<form action="/gallery/{{id}}?_method=DELETE" method='POST'>
+  <button type='submit'>delete</button>
+</form>

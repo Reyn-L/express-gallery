@@ -9,7 +9,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 let db = require('./models');
 
-let photos = db.Photos;
+let photos = db.photos;
 
 app.get('/', function(req, res) {
   photos.findAll()
