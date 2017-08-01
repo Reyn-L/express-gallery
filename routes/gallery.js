@@ -6,9 +6,9 @@ let db = require('../models');
 let Authors = db.authors;
 let photos = db.photos;
 
-router.get('/', getAllGalleries);
 router.get('/new', newGalleryForm);
 router.get('/:id', displayGalleryPhoto);
+router.get('/', getAllGalleries);
 router.get('/:id/edit', editPhoto);
 
 router.post('/', loadNewPhoto);
@@ -20,8 +20,13 @@ router.delete('/:id', deletePhoto);
 function getAllGalleries(req, res) {
   photos.findAll()
   .then(function (photos) {
-    console.log(photos);
-    res.render('gallery');
+    let str = JSON.stringify(photos);
+    let dbs = {databaseEntry: [str[0]]}
+     // res.json(photos);
+     res.render('gallery/index', str);
+  })
+  .catch((err) => {
+    console.log(err);
   });
 }
 
