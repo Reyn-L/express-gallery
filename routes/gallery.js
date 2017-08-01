@@ -7,10 +7,14 @@ let Authors = db.authors;
 let photos = db.photos;
 
 router.get('/', getAllGalleries);
+
+//done
 router.get('/new', newGalleryForm);
+
 router.get('/:id', displayGalleryPhoto);
 router.get('/:id/edit', editPhoto);
 
+//done
 router.post('/', loadNewPhoto);
 
 router.put('/:id', updatePhoto);
