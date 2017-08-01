@@ -90,16 +90,14 @@ function loadNewPhoto(req, res) {
 }
 
 function updatePhoto(req, res){
+  console.log(req.body);
   Photos.update({
-    description : req.params.description
+    description : req.body.description
   },
   {
-    where: {
-      id:req.params.id
-    }
+    where: { id: req.params.id}
   })
   .then((photoById) => {
-
     res.redirect('/gallery/');
   });
 }
