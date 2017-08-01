@@ -1,34 +1,31 @@
 /*jshint esversion: 6*/
 const express = require('express');
+const methodOverride = require('method-override');
 const bodyParser = require('body-parser');
 const app = express();
 
+const expHbs = require('express-handlebars');
+
 let PORT = process.env.PORT || 8080;
 
+app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(methodOverride('_method'));
+
+const gal = require('./routes/gallery');
+app.use('/gallery', gal);
 
 let db = require('./models');
 
 let photos = db.Photos;
 
-app.get('/', function(req, res) {
-  photos.findAll()
-  .then(function (photos) {
-    res.json(photos);
-  });
+const hbs = expHbs.create({
+  defaultLayout: 'main',
+  extname: 'hbs'
 });
 
-// app.post('/', function (req, res) {
-//   Photo.create({ name: req.body.name, unique: true })
-//   .then(function (user) {
-//     res.json(user);
-//   });
-// });
-
-
-app.get('/gallery/:id', (req, res) => {
-  res.render('views/gallery');
-});
+app.engine('hbs', hbs.engine);
+app.set('view engine', 'hbs');
 
 app.listen(PORT, () => {
   db.sequelize.drop();
