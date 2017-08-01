@@ -2,14 +2,16 @@
 /*jshint esversion: 6 */
 const express = require('express');
 const router = express.Router();
-const pgp = require('pg-promise')();
+let db = require('../models');
+let Authors = db.authors;
+let photos = db.photos;
 
 // const cn = {
 //     host: 'localhost',
 //     port: 5432,
 //     database: 'products_articles'
 // };
-const db = pgp('postgres://localhost:5432/products_articles');
+
 
 router.get('/', getAllGalleries);
 router.get('/gallery/new', newGalleryForm);
@@ -25,7 +27,8 @@ router.delete('/gallery/:id', deletePhoto);
 function getAllGalleries(req, res) {
   photos.findAll()
   .then(function (photos) {
-    res.json(photos);
+    console.log(photos);
+    res.render('gallery');
   });
 }
 
@@ -36,7 +39,11 @@ function newGalleryForm(req, res) {
 
 //Displays a gallery photo based on request ID
 function displayGalleryPhoto(req, res) {
-  res.render('views/gallery');
+  photos.findOne()
+  .then(Photo => {
+    console.log(photo.get('name'));
+    res.render('views/gallery');
+  });
 }
 
 function editPhoto(req, res){
@@ -44,10 +51,15 @@ function editPhoto(req, res){
 }
 
 function loadNewPhoto(req, res){
-  res.render('views/gallery');
+
+  res.render('gallery/new');
 }
 
 function deletePhoto(req, res){
+  res.render('views/gallery');
+}
+
+function updatePhoto(req, res){
   res.render('views/gallery');
 }
 
