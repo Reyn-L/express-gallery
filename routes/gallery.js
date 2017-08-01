@@ -2,6 +2,9 @@
 /*jshint esversion: 6 */
 const express = require('express');
 const router = express.Router();
+let db = require('../models');
+let Authors = db.authors;
+let photos = db.photos;
 
 router.get('/', getAllGalleries);
 router.get('new', newGalleryForm);
@@ -15,11 +18,11 @@ router.put('/:id', updatePhoto);
 router.delete('/:id', deletePhoto);
 
 function getAllGalleries(req, res) {
-  res.render('gallery/new');
-  // photos.findAll()
-  // .then(function (photos) {
-  //   res.json(photos);
-  // });
+  photos.findAll()
+  .then(function (photos) {
+    console.log(photos);
+    res.render('gallery');
+  });
 }
 
 //Display Gallery Form
@@ -29,7 +32,11 @@ function newGalleryForm(req, res) {
 
 //Displays a gallery photo based on request ID
 function displayGalleryPhoto(req, res) {
-  res.render('/views/gallery');
+  photos.findOne()
+  .then(Photo => {
+    console.log(photo.get('name'));
+    res.render('views/gallery');
+  });
 }
 
 function editPhoto(req, res){
@@ -45,6 +52,10 @@ function updatePhoto(req, res){
 }
 
 function deletePhoto(req, res){
+  res.render('views/gallery');
+}
+
+function updatePhoto(req, res){
   res.render('views/gallery');
 }
 
