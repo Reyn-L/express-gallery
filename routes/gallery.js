@@ -4,7 +4,7 @@ const express = require('express');
 const router = express.Router();
 let db = require('../models');
 let Authors = db.authors;
-let photos = db.photos;
+let Photos = db.photos;
 
 router.get('/', getAllGalleries);
 
@@ -23,12 +23,11 @@ router.put('/:id', updatePhoto);
 router.delete('/:id', deletePhoto);
 
 function getAllGalleries(req, res) {
-  photos.findAll()
-  .then(function (photos) {
-    let str = JSON.stringify(photos);
-    let dbs = {databaseEntry: [str[0]]};
-     // res.json(photos);
-     res.render('gallery/index', str);
+  Photos.findAll()
+  .then( function (fotos) {
+    let locals = { databaseEntries: fotos };
+    console.log(locals.databaseEntries[0]);
+    res.render('gallery/index', locals);
   })
   .catch((err) => {
     console.log(err);
@@ -42,11 +41,11 @@ function newGalleryForm(req, res) {
 
 //Displays a gallery photo based on request ID
 function displayGalleryPhoto(req, res) {
-  photos.findOne()
-  .then(Photo => {
-    console.log(photo.get('name'));
-    res.render('views/gallery');
-  });
+  // Photos.findOne()
+  // .then(Photo => {
+  //   console.log(photo.get('name'));
+  //   res.render('views/gallery');
+  // });
 }
 
 function editPhoto(req, res){
@@ -68,14 +67,14 @@ function loadNewPhoto(req, res) {
       Authors.create( {name: name} )
       .then( ret => {
         auId = ret.dataValues.id;
-        photos.create( {link: url, description: description, authorId: auId} );
+        Photos.create( {link: url, description: description, authorId: auId} );
         let locals = { databaseEntry : [{ url, description, name } ] } ;
         console.log(locals);
         res.render('gallery/index', locals);
       });
     } else {
       auId = result[0].dataValues.id;
-      photos.create({link: url, description: description, authorId: auId});
+      Photos.create({link: url, description: description, authorId: auId});
       let locals = { databaseEntry : { url, description, name } };
       res.render('gallery/index', locals);
     }

@@ -27,8 +27,8 @@ let db = require('./models');
 let photos = db.photos;
 
 app.listen(PORT, () => {
-  db.sequelize.drop();
-  db.sequelize.sync({force: true});
+  // db.sequelize.drop();
+  // db.sequelize.sync({force: true});
   console.log(`server running on ${PORT}`);
 });
 
