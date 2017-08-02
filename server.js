@@ -35,7 +35,6 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-
 const gal = require('./routes/gallery');
 app.use('/gallery', gal);
 
@@ -43,36 +42,40 @@ passport.serializeUser((user, cb)=> {
   cb(null, user.id);
 });
 
-passport.deserializeUser((user, cb) => {
-  Users.findById(userId, cb);
+passport.deserializeUser((userId, cb) => {
+  Users.findById(userId)
+  .then( data => cb(null, data));
 });
 
-passport.use(new LocalStrategy((name, password, done) => {
-  console.log(name);
-  Users.findOne({name: name}, function (err,user) {
-    if(err) {
-      console.log('err', err);
-      return done(err);
+passport.use(new LocalStrategy((username, password, done) => {
+  console.log('username coming in ', username);
+  Users.findOne( { where: { name: username } })
+  .then( data => {
+    console.log(data.name);
+
+    if(!data) {
+      console.log('error');
+      return done('error');
     }
-    if(!user) {
-      console.log('!user');
+    if(!data.name) {
+      console.log('username not found');
       return done(null, false, {
         message: 'Incorrect name'
       });
     }
-    if(user.password !== password) {
-      console.log('password');
+    if(data.password !== password) {
+      console.log('password', password);
       return done(null, false, {
         message: "Incorrect password"
       });
     }
     console.log('success');
-    return done(null, user);
+    return done(null, data);
   });
 }));
 
 app.post('/login', passport.authenticate('local', {
-  successRedirect: '/index',
+  successRedirect: '/gallery/',
   failureRedirect: '/'
 }));
 
@@ -86,7 +89,6 @@ app.get('/logout', (req, res) => {
 });
 
 app.post('/register', addNewUser);
-
 
 app.listen(PORT, () => {
   db.sequelize.drop();
