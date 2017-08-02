@@ -5,6 +5,9 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
+const db = require('./models');
+const Photos = db.photos;
+const Users = db.users;
 
 const app = express();
 
@@ -32,19 +35,58 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+
 const gal = require('./routes/gallery');
 app.use('/gallery', gal);
 
-let db = require('./models');
-let Photos = db.photos;
-let Users = db.users;
+passport.serializeUser((user, cb)=> {
+  cb(null, user.id);
+});
 
-app.post('/login', passport.authenticate('local', {
-  successRedirect: '/secret',
-  failureRedirect: '/login.html'
+passport.deserializeUser((user, cb) => {
+  Users.findById(userId, cb);
+});
+
+passport.use(new LocalStrategy((name, password, done) => {
+  console.log(name);
+  Users.findOne({name: name}, function (err,user) {
+    if(err) {
+      console.log('err', err);
+      return done(err);
+    }
+    if(!user) {
+      console.log('!user');
+      return done(null, false, {
+        message: 'Incorrect name'
+      });
+    }
+    if(user.password !== password) {
+      console.log('password');
+      return done(null, false, {
+        message: "Incorrect password"
+      });
+    }
+    console.log('success');
+    return done(null, user);
+  });
 }));
 
+app.post('/login', passport.authenticate('local', {
+  successRedirect: '/index',
+  failureRedirect: '/'
+}));
+
+app.get('/index', isAuthenticated, (req, res) => {
+  res.send('it works!');
+});
+
+app.get('/logout', (req, res) => {
+  req.logout();
+  res.redirect('/');
+});
+
 app.post('/register', addNewUser);
+
 
 app.listen(PORT, () => {
   db.sequelize.drop();
@@ -63,3 +105,12 @@ function addNewUser(req, res){
     res.redirect('/index.html');
   });
 }
+
+function isAuthenticated(req, res ,next) {
+  if(req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect('/index');
+}
+
+
