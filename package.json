@@ -9,8 +9,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "connect-flash": "^0.1.1",
+    "express-flash": "0.0.2",
     "express-handlebars": "^3.0.0",
     "express-session": "^1.15.4",
+    "flash-messages": "0.0.4",
     "gulp": "^3.9.1",
     "gulp-sass": "^3.1.0",
     "method-override": "^2.3.9",

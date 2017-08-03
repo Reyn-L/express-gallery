@@ -1,7 +1,10 @@
 /*jshint esversion: 6*/
 module.exports = function(sequelize, DataTypes) {
   var User = sequelize.define("users", {
-    name: DataTypes.STRING,
+    name: {
+      type: DataTypes.STRING,
+      unique: true
+    },
     password: DataTypes.STRING
   });
 

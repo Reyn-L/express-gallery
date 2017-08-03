@@ -6,7 +6,7 @@ module.exports = function(sequelize, DataTypes) {
       }
     },
     description: DataTypes.TEXT,
-    owner: DataTypes.STRING
+    owner: DataTypes.INTEGER
   });
   Photo.associate = function(models){
     Photo.belongsTo(models.authors);

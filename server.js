@@ -8,12 +8,14 @@ const session = require('express-session');
 const db = require('./models');
 const Photos = db.photos;
 const Users = db.users;
+const flash = require('connect-flash');
 
 const app = express();
 
 const expHbs = require('express-handlebars');
 
 let PORT = process.env.PORT || 3000;
+
 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -32,8 +34,11 @@ app.use(session({
   resave: false,
   saveUninitialized: false
 }));
+
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use(flash());
 
 const gal = require('./routes/gallery');
 app.use('/gallery', gal);
@@ -48,23 +53,17 @@ passport.deserializeUser((userId, cb) => {
 });
 
 passport.use(new LocalStrategy((username, password, done) => {
-  console.log('username coming in ', username);
   Users.findOne( { where: { name: username } })
   .then( data => {
-    console.log(data.name);
-
-    if(!data) {
-      console.log('error');
-      return done('error');
-    }
-    if(!data.name) {
-      console.log('username not found');
+    // if(err) {
+    //   return done(err);
+    // }
+    if(!data || !data.name) {
       return done(null, false, {
         message: 'Incorrect name'
       });
     }
     if(data.password !== password) {
-      console.log('password', password);
       return done(null, false, {
         message: "Incorrect password"
       });
@@ -74,9 +73,12 @@ passport.use(new LocalStrategy((username, password, done) => {
   });
 }));
 
+app.get('/', showLoginScreen);
+
 app.post('/login', passport.authenticate('local', {
   successRedirect: '/gallery/',
-  failureRedirect: '/'
+  failureRedirect: '/',
+  failureFlash: 'Invalid username/password combination.'
 }));
 
 app.get('/index', isAuthenticated, (req, res) => {
@@ -90,22 +92,24 @@ app.get('/logout', (req, res) => {
 
 app.post('/register', addNewUser);
 
-app.listen(PORT, () => {
-  db.sequelize.drop();
-  db.sequelize.sync({force: true});
-  console.log(`server running on ${PORT}`);
-});
-
-module.exports = app;
-
 function addNewUser(req, res){
   let username = req.body.username;
   let password = req.body.password;
 
   Users.create( { name: username, password: password } )
   .then( data => {
-    res.redirect('/index.html');
+    res.redirect('/');
   });
+}
+
+function showLoginScreen(req, res){
+  let err = req.flash();
+  if ( Object.keys(err).length !== 0 ){
+    let errMessage = { errorMessage: err.error[0] };
+    res.render('gallery/login', errMessage );
+    return;
+  }
+  res.render('gallery/login');
 }
 
 function isAuthenticated(req, res ,next) {
@@ -115,4 +119,10 @@ function isAuthenticated(req, res ,next) {
   res.redirect('/index');
 }
 
+app.listen(PORT, () => {
+  // db.sequelize.drop();
+  // db.sequelize.sync({force: true});
+  console.log(`server running on ${PORT}`);
+});
 
+module.exports = app;
