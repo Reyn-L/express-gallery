@@ -1,3 +1,4 @@
+/*jshint esversion: 6*/
 module.exports = function(sequelize, DataTypes) {
   var User = sequelize.define("users", {
     name: DataTypes.STRING,
@@ -6,3 +7,4 @@ module.exports = function(sequelize, DataTypes) {
 
   return User;
 };
+
