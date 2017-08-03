@@ -1,7 +1,35 @@
-<h1> Gallery </h1>
-{{#each databaseEntries}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body>
+  {{#each databaseEntries}}
   <img class="link" src={{link}}>
   <p class="description">{{description}}</p>
   <p class="name">{{author.name}}</p>
   <p class="id">id: {{id}}</p>
-{{/each}}
+  {{/each}}
+  <div class='hometop'>
+    <h1 class= 'homeheader'> Husky </h1>
+    <span class= 'homedescription'> blah blah blah </span>
+  </div>
+  <div class= 'homecontent'>
+    <span class='homeauthor'>Author and Url for Photo</span>
+    <div class='homeimgcontainer'><img class='homeimg' src='https://s-media-cache-ak0.pinimg.com/736x/cd/a5/1b/cda51b70758b5302de57225b7c52a202--husky-eyes-fluffy-dogs.jpg'></div>
+    <span class='hometext'>text</span>
+    <span class="hometextbot"> text </span>
+    <span class="hometextbot"> text </span>
+  </div>
+  <div class=homerightcontent>
+    <span class='homerightimg'><img class='homeimgright' src='https://s-media-cache-ak0.pinimg.com/736x/cd/a5/1b/cda51b70758b5302de57225b7c52a202--husky-eyes-fluffy-dogs.jpg'></span>
+    <span class='homerighttext'>text</span>
+    <span class='homerightimg'><img class='homeimgright' src='https://s-media-cache-ak0.pinimg.com/736x/cd/a5/1b/cda51b70758b5302de57225b7c52a202--husky-eyes-fluffy-dogs.jpg'></span>
+    <span class='homerighttext'>text</span>
+   <span class='homerightimg'><img class='homeimgright' src='https://s-media-cache-ak0.pinimg.com/736x/cd/a5/1b/cda51b70758b5302de57225b7c52a202--husky-eyes-fluffy-dogs.jpg'></span>
+   <span class='homerighttext'>text</span>
+  </div>
+</body>
+</html>
