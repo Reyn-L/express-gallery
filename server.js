@@ -59,8 +59,11 @@ passport.deserializeUser((userId, cb) => {
 
 passport.use(new LocalStrategy(
   function(username, password, done) {
-    db.users.findOne({ where: { username: username } })
+    console.log(username);
+    console.log(password);
+    Users.findOne({ where: { name: username } })
     .then ( user => {
+      console.log(user);
       if (user === null) {
         return done(null, false, {message: 'bad username or password'});
       }
@@ -69,6 +72,7 @@ passport.use(new LocalStrategy(
         .then(res => {
           if (res) { return done(null, user); }
           else {
+            console.log('not working');
             return done(null, false, {message: 'bad username or password'});
           }
         });
@@ -86,6 +90,10 @@ app.post('/login', passport.authenticate('local', {
   failureFlash: 'Invalid username/password combination.'
 }));
 
+app.get('/login', (req, res) => {
+  res.redirect('/');
+});
+
 app.get('/logout', (req, res) => {
   req.logout();
   res.redirect('/');
@@ -96,13 +104,13 @@ app.post('/register', addNewUser);
 function addNewUser(req, res){
   bcrypt.genSalt(saltRounds, function(err, salt){
     bcrypt.hash(req.body.password, salt, function(err, hash){
-      User.create({
-        username: req.body.username,
+      Users.create({
+        name: req.body.username,
         password: hash
       })
       .then( (user) => {
         console.log(user);
-        res.redirect('/login');
+        res.redirect('/');
       })
       .catch( err => { return res.send('Stupid username'); });
     });
@@ -127,8 +135,8 @@ function isAuthenticated(req, res ,next) {
 }
 
 app.listen(PORT, () => {
-  // db.sequelize.drop();
-  // db.sequelize.sync({force: true});
+  db.sequelize.drop();
+  db.sequelize.sync({force: true});
   console.log(`server running on ${PORT}`);
 });
 

@@ -27,10 +27,6 @@ let errorMessages = [
 {
   key: 'permission_denied',
   value: "You do not have permission to edit this file."
-},
-{
-  key: 'not_logged_in',
-  value: "You must log in to perform that operation."
 }];
 
 function getAllGalleries(req, res) {
@@ -57,10 +53,9 @@ function getAllGalleries(req, res) {
 
 //Display Gallery Form
 function newGalleryForm(req, res) {
-  req.flash(errorMessages);
   let currUser = getSessionPassportId(req.session);
   if (currUser === false ) {
-    res.render('gallery/login', { errorMessage : req.flash('not_logged_in') });
+    res.render('gallery/login', { errorMessage : "You must log in to perform that operation." });
     return;
   }
   res.render('gallery/new');
@@ -80,14 +75,13 @@ function displayGalleryPhoto(req, res) {
 }
 
 function editPhoto(req, res){
- req.flash(errorMessages);
  let currUser = getSessionPassportId(req.session);
 
  Photos.findById(req.params.id,
   {include: [{model: Authors}]})
  .then((photoById) => {
   if (currUser !== photoById.owner){
-    res.render('gallery/login', { errorMessage: req.flash(not_logged_in) });
+    res.render('gallery/login', { errorMessage: "You must log in to perform that operation." });
     return;
   }
   let locals = {id : photoById.id, link: photoById.link, description: photoById.description, name: photoById.author.name };
@@ -101,8 +95,8 @@ function loadNewPhoto(req, res) {
   let description = req.body.description;
   req.flash(errorMessages);
   let currUser = getSessionPassportId(req.session);
-  if (currUser === false ) {
-    res.render('gallery/login', { errorMessage : req.flash('not_logged_in') });
+  if (currUser === false || currUser === undefined ) {
+    res.render('gallery/login', { errorMessage : "You must log in to perform that operation." });
     return;
   }
 
@@ -131,7 +125,7 @@ function updatePhoto(req, res){
 
   let sessionId = getSessionPassportId(req.session);
   if (!sessionId) {
-    res.render('gallery/login', { errorMessage : req.flash('not_logged_in') });
+    res.render('gallery/login', { errorMessage : "You must log in to perform that operation." });
     return;
   }
   Photos.findById(req.params.id)
@@ -147,7 +141,7 @@ function deletePhoto(req, res){
 }
 
 function getSessionPassportId(sess){
-  if (!sess.passport){
+  if (!sess.passport && !sess.passport.user){
     return false;
   }
   return sess.passport.user;
