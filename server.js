@@ -10,6 +10,10 @@ const Photos = db.photos;
 const Users = db.users;
 const flash = require('connect-flash');
 
+const RedisStore = require('connect-redis')(session);
+const saltRounds = 10;
+const bcrypt = require('bcrypt');
+
 const app = express();
 
 const expHbs = require('express-handlebars');
@@ -30,6 +34,7 @@ app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
 
 app.use(session({
+  store: new RedisStore(),
   secret: 'keyboard cat',
   resave: false,
   saveUninitialized: false
@@ -52,26 +57,26 @@ passport.deserializeUser((userId, cb) => {
   .then( data => cb(null, data));
 });
 
-passport.use(new LocalStrategy((username, password, done) => {
-  Users.findOne( { where: { name: username } })
-  .then( data => {
-    // if(err) {
-    //   return done(err);
-    // }
-    if(!data || !data.name) {
-      return done(null, false, {
-        message: 'Incorrect name'
-      });
-    }
-    if(data.password !== password) {
-      return done(null, false, {
-        message: "Incorrect password"
-      });
-    }
-    console.log('success');
-    return done(null, data);
-  });
-}));
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    db.users.findOne({ where: { username: username } })
+    .then ( user => {
+      if (user === null) {
+        return done(null, false, {message: 'bad username or password'});
+      }
+      else {
+        bcrypt.compare(password, user.password)
+        .then(res => {
+          if (res) { return done(null, user); }
+          else {
+            return done(null, false, {message: 'bad username or password'});
+          }
+        });
+      }
+    })
+    .catch(err => { console.log('error: ', err); });
+  }
+));
 
 app.get('/', showLoginScreen);
 
@@ -81,10 +86,6 @@ app.post('/login', passport.authenticate('local', {
   failureFlash: 'Invalid username/password combination.'
 }));
 
-app.get('/index', isAuthenticated, (req, res) => {
-  res.send('it works!');
-});
-
 app.get('/logout', (req, res) => {
   req.logout();
   res.redirect('/');
@@ -93,12 +94,18 @@ app.get('/logout', (req, res) => {
 app.post('/register', addNewUser);
 
 function addNewUser(req, res){
-  let username = req.body.username;
-  let password = req.body.password;
-
-  Users.create( { name: username, password: password } )
-  .then( data => {
-    res.redirect('/');
+  bcrypt.genSalt(saltRounds, function(err, salt){
+    bcrypt.hash(req.body.password, salt, function(err, hash){
+      User.create({
+        username: req.body.username,
+        password: hash
+      })
+      .then( (user) => {
+        console.log(user);
+        res.redirect('/login');
+      })
+      .catch( err => { return res.send('Stupid username'); });
+    });
   });
 }
 
