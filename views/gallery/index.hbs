@@ -1,0 +1,13 @@
+{{>head_buttons}}
+<h1> Gallery </h1>
+{{#each databaseEntries}}
+  <img class="link" src={{link}}>
+  <p class="description">{{description}}</p>
+  <p class="name">{{author.name}}</p>
+  {{#if showEditButton}}
+    <form>
+      <button type="submit" formmethod="get" formaction="/gallery/{{id}}/edit" name="edit">Edit</button>
+    </form>
+  {{/if}}
+{{/each}}
+
